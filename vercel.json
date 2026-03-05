@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/cron-roi", "schedule": "10 0 * * *" },
+    { "path": "/api/cron-rank", "schedule": "15 0 * * *" }
+  ]
+}
