@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "tsx watch src/server.ts",
     "dev:client": "cd client && npm run dev",
-    "vercel-build": "cd client && npm install && npm run build",
+    "vercel-build": "npm install --prefix client && npm run build --prefix client",
     "build": "echo 'Skipping root build...'",
     "start": "node dist/server.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
