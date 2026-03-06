@@ -1,24 +1,25 @@
-import Fastify from 'fastify';
-import sensible from '@fastify/sensible';
-import { config } from './config.js';
-import { registerRoutes } from './web/routes.js';
-import cron from 'node-cron';
-import { runDailyRoiDistribution } from './tasks/roiJob.js';
-import { runDailyRankEvaluation } from './tasks/rankJob.js';
+import { createApp } from './builder/AppBuilder.js';
 
 async function main() {
-  const app = Fastify({ logger: true });
-  await app.register(sensible);
-  registerRoutes(app);
+  // Builder-style setup (new way)
+  const app = await createApp()
+    .withSensible()
+    .withRoutes()
+    .withCronJobs()
+    .start();
 
-  if (config.enableInProcessCron) {
-    cron.schedule('10 0 * * *', async () => {
-      await runDailyRoiDistribution(app.log);
-      await runDailyRankEvaluation(app.log);
-    });
-  }
+  console.log(`Server running on port ${app.server.address().port}`);
+}
 
-  await app.listen({ port: config.port, host: '0.0.0.0' });
+// Legacy setup function for backward compatibility
+export async function setupServer() {
+  const app = await createApp()
+    .withSensible()
+    .withRoutes()
+    .withCronJobs()
+    .build();
+  
+  return app;
 }
 
 main().catch((err) => {
