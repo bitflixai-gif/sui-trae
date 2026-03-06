@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUI24 Wallet & Packages</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .card { border: 1px solid #ccc; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px; }
+        .hidden { display: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+        .pkg-card { border: 1px solid #eee; padding: 1rem; border-radius: 4px; background: #f9f9f9; }
+        button { background: #0070f3; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #0051a2; }
+        input { padding: 0.5rem; margin-right: 0.5rem; }
+        .balance { font-size: 1.5rem; font-weight: bold; color: #333; }
+    </style>
+</head>
+<body>
+    <h1>My Wallet</h1>
+    
+    <div id="auth-check" class="card">
+        Checking authentication...
+    </div>
+
+    <div id="dashboard" class="hidden">
+        <!-- Wallet Section -->
+        <div class="card">
+            <h2>Balances</h2>
+            <div class="grid">
+                <div>
+                    <p>Deposit Wallet</p>
+                    <div class="balance" id="bal-deposit">0.00 SUI</div>
+                </div>
+                <div>
+                    <p>Earnings Wallet</p>
+                    <div class="balance" id="bal-earnings">0.00 SUI</div>
+                </div>
+                <div>
+                    <p>Commission Wallet</p>
+                    <div class="balance" id="bal-commission">0.00 SUI</div>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 1.5rem;">Deposit Funds (Simulated)</h3>
+            <div style="display: flex;">
+                <input type="number" id="deposit-amount" placeholder="Amount (SUI)" value="1000">
+                <button onclick="deposit()">Deposit</button>
+            </div>
+            <p id="deposit-msg"></p>
+        </div>
+
+        <!-- Packages Section -->
+        <div class="card">
+            <h2>Available Packages</h2>
+            <div id="pkg-list" class="grid">
+                <!-- Packages will be loaded here -->
+            </div>
+            <p id="purchase-msg"></p>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        async function init() {
+            try {
+                // Check auth
+                const meRes = await fetch('/api/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!meRes.ok) throw new Error('Unauthorized');
+                
+                document.getElementById('auth-check').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                
+                loadWallet();
+                loadPackages();
+            } catch (e) {
+                window.location.href = '/login.html';
+            }
+        }
+
+        async function loadWallet() {
+            try {
+                const res = await fetch('/api/wallet', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                
+                document.getElementById('bal-deposit').textContent = formatSui(data.deposit_wallet);
+                document.getElementById('bal-earnings').textContent = formatSui(data.earnings_wallet);
+                document.getElementById('bal-commission').textContent = formatSui(data.commission_wallet);
+            } catch (e) {
+                console.error('Wallet load failed', e);
+            }
+        }
+
+        async function deposit() {
+            const amount = document.getElementById('deposit-amount').value;
+            try {
+                const res = await fetch('/api/wallet/deposit', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ amount })
+                });
+                
+                if (res.ok) {
+                    document.getElementById('deposit-msg').textContent = 'Deposit successful!';
+                    loadWallet();
+                } else {
+                    const data = await res.json();
+                    document.getElementById('deposit-msg').textContent = 'Error: ' + data.error;
+                }
+            } catch (e) {
+                document.getElementById('deposit-msg').textContent = 'Error: ' + e.message;
+            }
+        }
+
+        async function loadPackages() {
+            try {
+                const res = await fetch('/api/packages');
+                const data = await res.json();
+                
+                const container = document.getElementById('pkg-list');
+                container.innerHTML = '';
+                
+                data.packages.forEach(pkg => {
+                    const div = document.createElement('div');
+                    div.className = 'pkg-card';
+                    div.innerHTML = `
+                        <h3>${pkg.name}</h3>
+                        <p><strong>Price:</strong> ${formatSui(pkg.price_sui)}</p>
+                        <p><strong>ROI:</strong> ${pkg.roi_percent}% / day</p>
+                        <p><strong>Duration:</strong> ${pkg.duration_days} days</p>
+                        <button onclick="purchase('${pkg.id}')">Buy Now</button>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (e) {
+                console.error('Packages load failed', e);
+            }
+        }
+
+        async function purchase(packageId) {
+            if (!confirm('Confirm purchase? Funds will be deducted from your Deposit Wallet.')) return;
+            
+            try {
+                const res = await fetch('/api/packages/purchase', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ packageId })
+                });
+                
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Package activated successfully!');
+                    loadWallet();
+                } else {
+                    alert('Purchase failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        function formatSui(val) {
+            return parseFloat(val || 0).toFixed(2) + ' SUI';
+        }
+
+        init();
+    </script>
+</body>
+</html>

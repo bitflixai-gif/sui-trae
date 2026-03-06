@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <style>
+    body { font-family: sans-serif; max-width: 420px; margin: 40px auto; }
+    label { display: block; margin: 8px 0 4px; }
+    input, button { width: 100%; padding: 8px; margin-bottom: 12px; }
+    pre { background: #f6f8fa; padding: 12px; }
+  </style>
+  <script>
+    async function submitForm(e) {
+      e.preventDefault();
+      const payload = {
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        sponsorReferralCode: document.getElementById('sponsor').value || undefined
+      };
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const text = await res.text();
+      document.getElementById('out').textContent = text;
+    }
+  </script>
+</head>
+<body>
+  <h1>Register</h1>
+  <form onsubmit="submitForm(event)">
+    <label>Username</label>
+    <input id="username" required minlength="3" />
+    <label>Email</label>
+    <input id="email" type="email" required />
+    <label>Password</label>
+    <input id="password" type="password" required minlength="8" />
+    <label>Sponsor Referral Code</label>
+    <input id="sponsor" />
+    <button type="submit">Register</button>
+  </form>
+  <pre id="out"></pre>
+  <p><a href="/login.html">Login</a></p>
+</body>
+</html>

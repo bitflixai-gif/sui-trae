@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    body { font-family: sans-serif; max-width: 420px; margin: 40px auto; }
+    label { display: block; margin: 8px 0 4px; }
+    input, button { width: 100%; padding: 8px; margin-bottom: 12px; }
+    pre { background: #f6f8fa; padding: 12px; }
+  </style>
+  <script>
+    async function login(e) {
+      e.preventDefault();
+      const payload = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      };
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.token) localStorage.setItem('token', data.token);
+      document.getElementById('out').textContent = JSON.stringify(data, null, 2);
+    }
+    async function me() {
+      const token = localStorage.getItem('token') || '';
+      const res = await fetch('/api/me', {
+        headers: { 'authorization': 'Bearer ' + token }
+      });
+      const text = await res.text();
+      document.getElementById('out').textContent = text;
+    }
+  </script>
+  </head>
+<body>
+  <h1>Login</h1>
+  <form onsubmit="login(event)">
+    <label>Email</label>
+    <input id="email" type="email" required />
+    <label>Password</label>
+    <input id="password" type="password" required />
+    <button type="submit">Login</button>
+  </form>
+  <button onclick="me()">Call /api/me</button>
+  <pre id="out"></pre>
+  <p><a href="/register.html">Register</a></p>
+</body>
+</html>

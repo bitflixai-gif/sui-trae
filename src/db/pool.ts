@@ -5,6 +5,7 @@ export const pool = new Pool({
   connectionString: config.databaseUrl,
   max: 20,
   idleTimeoutMillis: 30000,
+  ssl: config.databaseUrl.includes('localhost') ? false : { rejectUnauthorized: false },
 });
 
 export async function withTransaction<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {

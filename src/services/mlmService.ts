@@ -12,6 +12,37 @@ export class MlmService {
     return res.rows;
   }
 
+  async getDirectReferrals(client: PoolClient, userId: string) {
+    const res = await client.query(
+      `select id, username, email, created_at, 
+       (select sum(amount) from user_packages where user_id = users.id and status = 'active') as active_investment
+       from users 
+       where sponsor_id = $1
+       order by created_at desc`,
+      [userId],
+    );
+    return res.rows;
+  }
+
+  async getTeamStats(client: PoolClient, userId: string) {
+    // Total team size (all levels)
+    const sizeRes = await client.query(
+      `select count(*) as count from mlm_tree where upline_id = $1`,
+      [userId]
+    );
+    
+    // Total team volume
+    const volRes = await client.query(
+      `select volume from user_team_volume where user_id = $1`,
+      [userId]
+    );
+
+    return {
+      totalTeam: sizeRes.rows[0]?.count ?? 0,
+      teamVolume: volRes.rows[0]?.volume ?? 0,
+    };
+  }
+
   async insertTreeForNewUser(client: PoolClient, userId: string, sponsorId: string | null) {
     if (!sponsorId) return;
     let current = sponsorId;

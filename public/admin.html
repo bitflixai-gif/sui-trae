@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUI24 Admin Dashboard</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .card { border: 1px solid #ccc; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px; }
+        .hidden { display: none; }
+        input, button { padding: 0.5rem; margin-bottom: 0.5rem; width: 100%; box-sizing: border-box; }
+        button { background: #0070f3; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0051a2; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    
+    <div id="auth-section" class="card">
+        <h2>Login</h2>
+        <input type="email" id="email" placeholder="Email" value="admin@sui24.com">
+        <input type="password" id="password" placeholder="Password" value="password123">
+        <button onclick="login()">Login</button>
+        <p id="login-msg"></p>
+    </div>
+
+    <div id="dashboard" class="hidden">
+        <div class="card">
+            <h2>Create Package</h2>
+            <input type="text" id="pkg-name" placeholder="Package Name (e.g., Starter)">
+            <input type="number" id="pkg-price" placeholder="Price (SUI)">
+            <input type="number" id="pkg-roi" placeholder="Daily ROI % (e.g., 1.5)" step="0.1">
+            <input type="number" id="pkg-duration" placeholder="Duration (Days)">
+            <button onclick="createPackage()">Create Package</button>
+            <p id="create-msg"></p>
+        </div>
+
+        <div class="card">
+            <h2>Active Packages</h2>
+            <button onclick="loadPackages()">Refresh List</button>
+            <table id="pkg-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>ROI %</th>
+                        <th>Days</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('token');
+
+        if (token) {
+            showDashboard();
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    localStorage.setItem('token', data.token);
+                    token = data.token;
+                    document.getElementById('login-msg').textContent = 'Login successful!';
+                    showDashboard();
+                } else {
+                    document.getElementById('login-msg').textContent = 'Error: ' + data.error;
+                }
+            } catch (e) {
+                document.getElementById('login-msg').textContent = 'Network error';
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            loadPackages();
+        }
+
+        async function createPackage() {
+            const name = document.getElementById('pkg-name').value;
+            const price = document.getElementById('pkg-price').value;
+            const roi = document.getElementById('pkg-roi').value;
+            const duration = document.getElementById('pkg-duration').value;
+
+            try {
+                const res = await fetch('/api/packages/create', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ 
+                        name, 
+                        price_sui: price, 
+                        roi_percent: roi, 
+                        duration_days: parseInt(duration) 
+                    })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    document.getElementById('create-msg').textContent = 'Package created: ' + data.packageId;
+                    loadPackages();
+                    // Clear inputs
+                    document.getElementById('pkg-name').value = '';
+                    document.getElementById('pkg-price').value = '';
+                } else {
+                    document.getElementById('create-msg').textContent = 'Error: ' + (data.error || JSON.stringify(data));
+                }
+            } catch (e) {
+                document.getElementById('create-msg').textContent = 'Error: ' + e.message;
+            }
+        }
+
+        async function loadPackages() {
+            try {
+                const res = await fetch('/api/packages');
+                const data = await res.json();
+                
+                const tbody = document.querySelector('#pkg-table tbody');
+                tbody.innerHTML = '';
+                
+                if (data.packages) {
+                    data.packages.forEach(pkg => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${pkg.name}</td>
+                            <td>${pkg.price_sui} SUI</td>
+                            <td>${pkg.roi_percent}%</td>
+                            <td>${pkg.duration_days}</td>
+                            <td>${pkg.status}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (e) {
+                console.error('Failed to load packages', e);
+            }
+        }
+    </script>
+</body>
+</html>

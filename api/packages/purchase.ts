@@ -1,16 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { UserService } from '../src/services/userService.js';
-import { parseJsonBody } from '../src/utils/body.js';
+import { verifyAuthHeader } from '../../src/utils/jwt.js';
+import { PackageService } from '../../src/services/packageService.js';
+import { parseJsonBody } from '../../src/utils/body.js';
+
+const packageService = new PackageService();
 
 const schema = z.object({
-  username: z.string().min(3),
-  email: z.string().email(),
-  password: z.string().min(8),
-  sponsorReferralCode: z.string().optional(),
+  packageId: z.string().uuid(),
 });
-
-const userService = new UserService();
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -18,9 +16,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
   try {
+    const { userId } = verifyAuthHeader(req.headers.authorization);
     const body = parseJsonBody(req.body);
     const parsed = schema.parse(body);
-    const result = await userService.registerUser(parsed);
+
+    const result = await packageService.purchasePackage(userId, parsed.packageId);
     res.status(201).json(result);
   } catch (e: any) {
     res.status(400).json({ error: e?.message ?? 'bad_request' });

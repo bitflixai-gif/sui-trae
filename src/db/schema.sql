@@ -34,6 +34,12 @@ create table if not exists packages (
   status text not null default 'active' check (status in ('active','inactive'))
 );
 
+insert into packages(name, price_sui, roi_percent, duration_days, status) values
+  ('Starter', 100, 0.005, 30, 'active'),
+  ('Pro', 500, 0.007, 60, 'active'),
+  ('Elite', 2000, 0.01, 90, 'active')
+on conflict (name) do nothing;
+
 -- USER PACKAGES
 create table if not exists user_packages (
   id uuid primary key default gen_random_uuid(),

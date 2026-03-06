@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
 import { AuthService } from '../src/services/authService.js';
+import { parseJsonBody } from '../src/utils/body.js';
 
 const schema = z.object({
   email: z.string().email(),
@@ -15,7 +16,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
   try {
-    const parsed = schema.parse(req.body ?? {});
+    const body = parseJsonBody(req.body);
+    const parsed = schema.parse(body);
     const result = await authService.login(parsed);
     res.status(200).json(result);
   } catch (e: any) {

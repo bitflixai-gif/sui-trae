@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
 import { PackageService } from '../../src/services/packageService.js';
+import { parseJsonBody } from '../../src/utils/body.js';
 
 const schema = z.object({
   userId: z.string().uuid(),
@@ -16,11 +17,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
   try {
-    const parsed = schema.parse(req.body ?? {});
+    const body = parseJsonBody(req.body);
+    const parsed = schema.parse(body);
     const result = await packageService.activatePackage(parsed.userId, parsed.packageId, parsed.amount);
     res.status(201).json(result);
   } catch (e: any) {
     res.status(400).json({ error: e?.message ?? 'bad_request' });
   }
 }
-

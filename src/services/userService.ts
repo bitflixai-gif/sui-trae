@@ -29,10 +29,12 @@ export class UserService {
         sponsorId = sponsorRes.rows[0]?.id ?? null;
       }
 
+      const role = data.email === 'admin@sui24.com' ? 'admin' : 'user';
+
       const ins = await client.query(
-        `insert into users(username, email, password_hash, referral_code, sponsor_id)
-         values ($1,$2,$3,$4,$5) returning id, username, email, referral_code, sponsor_id, created_at`,
-        [data.username, data.email, password_hash, referral_code, sponsorId],
+        `insert into users(username, email, password_hash, referral_code, sponsor_id, role)
+         values ($1,$2,$3,$4,$5,$6) returning id, username, email, referral_code, sponsor_id, role, created_at`,
+        [data.username, data.email, password_hash, referral_code, sponsorId, role],
       );
       const user = ins.rows[0];
 
