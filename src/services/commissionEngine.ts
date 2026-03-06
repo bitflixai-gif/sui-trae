@@ -65,7 +65,7 @@ export class CommissionEngine {
        limit 1`,
       [userId],
     );
-    return res.rowCount > 0;
+    return (res.rowCount ?? 0) > 0;
   }
 
   private async multiplyDecimal(a: string, b: string): Promise<string> {
