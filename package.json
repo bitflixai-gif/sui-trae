@@ -8,6 +8,7 @@
     "dev:server": "tsx watch src/server.ts",
     "dev:client": "vite",
     "build": "vite build",
+    "vercel-build": "npx vite build",
     "start": "node dist/server.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
