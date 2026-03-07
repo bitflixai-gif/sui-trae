@@ -41,6 +41,17 @@ function App() {
   const [username, setUsername] = useState('');
   const [sponsor, setSponsor] = useState('');
   
+  // Check for referral code in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) {
+      setSponsor(ref);
+      setIsLogin(false); // Switch to signup
+      setShowAuth(true); // Show auth modal
+    }
+  }, []);
+  
   // Landing / Demo State
   const [showDemo, setShowDemo] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
@@ -372,6 +383,19 @@ function App() {
           </div>
         ) : !loading && (
           <>
+            {/* Referral Link */}
+            <div className="referral-banner" style={{background: 'var(--bg-card)', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid rgba(0, 243, 255, 0.2)'}}>
+              <span style={{color: 'var(--text-secondary)'}}>Referral Link:</span>
+              <div style={{display: 'flex', gap: '0.5rem'}}>
+                <code style={{background: 'rgba(0,0,0,0.3)', padding: '0.5rem', borderRadius: '0.3rem', color: 'var(--primary)'}}>
+                  {`${window.location.origin}?ref=${user?.referral_code}`}
+                </code>
+                <button onClick={() => navigator.clipboard.writeText(`${window.location.origin}?ref=${user?.referral_code}`)} style={{background: 'var(--primary)', border: 'none', borderRadius: '0.3rem', padding: '0 0.5rem', cursor: 'pointer', fontWeight: 'bold'}}>
+                  Copy
+                </button>
+              </div>
+            </div>
+
             {/* Wallet Cards */}
             <div className="stats-grid">
           <div className="stat-card">
