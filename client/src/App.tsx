@@ -160,13 +160,14 @@ function App() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert('Registration successful! Please login.');
+        alert('Welcome to Onboarding SUI24. Please check your mail for login.');
         setIsLogin(true);
       } else {
-        alert(data.error);
+        alert(data.error || 'Registration failed');
       }
     } catch (err) {
-      alert('Registration failed');
+      console.error(err);
+      alert('Network error during registration. Please try again.');
     } finally {
       setLoading(false);
     }
