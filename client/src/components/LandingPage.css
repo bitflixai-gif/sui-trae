@@ -1,7 +1,7 @@
 .landing-page {
   font-family: 'Inter', sans-serif;
   color: #fff;
-  background: #0f172a;
+  background: #050505;
   min-height: 100vh;
 }
 
@@ -68,6 +68,39 @@
 .btn-play:hover {
   background: var(--primary-hover);
   transform: translateY(-1px);
+}
+
+/* Ticker Animation */
+.price-ticker {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  padding: 0.8rem 0;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.ticker-track {
+  display: inline-block;
+  animation: ticker 40s linear infinite;
+}
+
+.ticker-item {
+  display: inline-block;
+  padding: 0 2rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.text-green {
+  color: var(--accent);
+  margin-left: 0.5rem;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 .hero {
@@ -157,12 +190,12 @@
 }
 
 .visual-card {
-  background: #1e293b;
+  background: var(--bg-card);
   padding: 2rem;
   border-radius: 1rem;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid rgba(0, 243, 255, 0.1);
   transform: rotate(-5deg);
-  box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
+  box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5), 0 0 30px rgba(0, 243, 255, 0.1);
 }
 
 .visual-header {
@@ -186,10 +219,17 @@
 }
 
 .feature-card {
-  background: #1e293b;
+  background: var(--bg-card);
   padding: 2rem;
   border-radius: 1rem;
   border: 1px solid rgba(255,255,255,0.05);
+  transition: transform 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary);
+  box-shadow: var(--glow-primary);
 }
 
 .feature-card h3 {
@@ -206,7 +246,7 @@
 .icon-purple { color: #a855f7; }
 
 .bonus-banner {
-  background: linear-gradient(to right, #3b82f6, #a855f7);
+  background: linear-gradient(to right, var(--primary), var(--accent));
   padding: 4rem 2rem;
   text-align: center;
   margin: 2rem;
@@ -217,11 +257,12 @@
   font-size: 2.5rem;
   font-weight: 900;
   margin-bottom: 1rem;
+  color: black;
 }
 
 .btn-secondary {
   background: white;
-  color: #3b82f6;
+  color: black;
   padding: 1rem 2rem;
   border-radius: 0.5rem;
   font-weight: 700;
@@ -234,7 +275,7 @@
   display: flex;
   justify-content: space-between;
   padding: 4rem 2rem;
-  background: #0b0e11;
+  background: #000;
   border-top: 1px solid #1e293b;
   max-width: 1200px;
   margin: 0 auto;
@@ -253,7 +294,7 @@
 }
 
 .footer-col a:hover {
-  color: #3b82f6;
+  color: var(--primary);
 }
 
 @media (max-width: 768px) {

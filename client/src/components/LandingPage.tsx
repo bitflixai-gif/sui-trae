@@ -20,6 +20,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlay, onLogin }) => 
         </div>
       </nav>
 
+      {/* Live Price Ticker */}
+      <div className="price-ticker">
+        <div className="ticker-track">
+          <span className="ticker-item">SUI <span className="text-green">$1.85 (+5.2%)</span></span>
+          <span className="ticker-item">BTC <span className="text-green">$65,420 (+2.1%)</span></span>
+          <span className="ticker-item">ETH <span className="text-green">$3,510 (+1.8%)</span></span>
+          <span className="ticker-item">SOL <span className="text-green">$148.50 (+4.5%)</span></span>
+          <span className="ticker-item">BNB <span className="text-green">$605.20 (+0.9%)</span></span>
+          {/* Duplicate for seamless loop */}
+          <span className="ticker-item">SUI <span className="text-green">$1.85 (+5.2%)</span></span>
+          <span className="ticker-item">BTC <span className="text-green">$65,420 (+2.1%)</span></span>
+          <span className="ticker-item">ETH <span className="text-green">$3,510 (+1.8%)</span></span>
+          <span className="ticker-item">SOL <span className="text-green">$148.50 (+4.5%)</span></span>
+          <span className="ticker-item">BNB <span className="text-green">$605.20 (+0.9%)</span></span>
+        </div>
+      </div>
+
       <section className="hero">
         <div className="hero-content">
           <div className="badge">1000x Crypto Futures</div>
