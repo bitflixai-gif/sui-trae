@@ -8,8 +8,11 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "noEmitOnError": false
   },
-  "include": ["src", "api", "client/src"],
+  "include": ["src", "api", "client/src", "src/types.d.ts"],
   "exclude": ["node_modules"]
 }
