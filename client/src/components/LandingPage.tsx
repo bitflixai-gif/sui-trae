@@ -354,6 +354,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlay, onLogin }) => 
           <h4>Support</h4>
           <a href="#">Contact</a>
           <a href="#">Help Center</a>
+          <a href="#">Bug Bounty 🛡️</a>
           <a href="#">Terms of Service</a>
         </div>
         <div className="footer-col">
