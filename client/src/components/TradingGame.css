@@ -19,7 +19,9 @@
   gap: 0.5rem;
   overflow-x: auto;
   padding-bottom: 0.5rem;
+  scrollbar-width: none; /* Hide scrollbar Firefox */
 }
+.pair-selector::-webkit-scrollbar { display: none; } /* Hide Chrome */
 
 .pair-btn {
   background: transparent;
@@ -185,4 +187,45 @@ th, td {
   border-radius: 0.2rem;
   font-weight: 700;
   margin-left: 0.5rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .game-layout {
+    grid-template-columns: 1fr; /* Stack chart and order panel */
+  }
+  
+  .chart-container {
+    height: 300px;
+  }
+  
+  .game-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .pair-info {
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 0.5rem;
+  }
+  
+  .account-controls {
+    justify-content: space-between;
+  }
+  
+  /* Positions Table Scroll */
+  .positions-panel {
+    overflow-x: auto;
+  }
+  
+  table {
+    min-width: 600px; /* Force horizontal scroll for table */
+  }
+  
+  th, td {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
 }
