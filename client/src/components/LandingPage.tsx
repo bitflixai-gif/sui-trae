@@ -53,12 +53,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlay, onLogin }) => 
       <section className="hero">
         <div className="hero-content">
           <div className="badge-pill">
-            <span className="pulse-dot"></span> 1000x Crypto Futures
+            <span className="pulse-dot"></span> Ultimate Crypto Future Arena
           </div>
-          <h1>SUI24 – The Future of <br /><span className="text-gradient">AI Powered Trading</span></h1>
+          <h1>SUI24 – <br /><span className="text-gradient">Trading & AI</span></h1>
           <p className="hero-sub">
-            Smart trading technology combined with automated rewards and secure digital earnings. 
-            Experience the next generation of fintech.
+            The Future of AI-Powered Digital Trading and Smart Earnings.
           </p>
           
           <div className="cta-group">
