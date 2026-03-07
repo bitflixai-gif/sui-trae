@@ -27,8 +27,24 @@ export const TradingGame: React.FC<TradingGameProps> = ({ token, realBalance, on
   const [demoBalance, setDemoBalance] = useState(10000); // $10k virtual funds
   
   // Market State
-  const [price, setPrice] = useState(65000); // BTC Price
+  const [symbol, setSymbol] = useState('BTC/USD');
+  const [price, setPrice] = useState(65000); 
   const [priceHistory, setPriceHistory] = useState<{time: number, price: number}[]>([]);
+  
+  const COINS: Record<string, number> = {
+    'BTC/USD': 65000,
+    'ETH/USD': 3500,
+    'SOL/USD': 150,
+    'BNB/USD': 600,
+    'SUI/USD': 1.85
+  };
+
+  // Switch Symbol Handler
+  const changeSymbol = (newSymbol: string) => {
+    setSymbol(newSymbol);
+    setPrice(COINS[newSymbol]);
+    setPriceHistory([]); // Clear chart
+  };
   
   // Order Form
   const [leverage, setLeverage] = useState(10);
@@ -44,7 +60,8 @@ export const TradingGame: React.FC<TradingGameProps> = ({ token, realBalance, on
   useEffect(() => {
     const interval = setInterval(() => {
       setPrice(prev => {
-        const change = (Math.random() - 0.5) * 50; // Random walk
+        const volatility = prev * 0.001; // 0.1% volatility per tick
+        const change = (Math.random() - 0.5) * volatility; 
         const newPrice = prev + change;
         
         setPriceHistory(history => {
@@ -55,6 +72,17 @@ export const TradingGame: React.FC<TradingGameProps> = ({ token, realBalance, on
         
         // Update PnL for active positions
         setPositions(prevPositions => prevPositions.map(pos => {
+          // Only update PnL if symbol matches, otherwise keep last known PnL? 
+          // Actually, in a real app, we'd track all prices. 
+          // For this game, we'll only simulate the CURRENT symbol's price accurately in chart,
+          // but strictly we should track all. 
+          // To keep it simple, we'll assume positions on other symbols rely on this simulation 
+          // ONLY if we simulate all tickers. 
+          // Limitation: If you switch symbols, PnL of other symbols won't update in this simple demo.
+          // Fix: We will only update PnL for positions matching current symbol.
+          
+          if (pos.symbol !== symbol) return pos;
+
           let pnl = 0;
           if (pos.direction === 'long') {
             pnl = ((newPrice - pos.entryPrice) / pos.entryPrice) * pos.size;
@@ -62,9 +90,7 @@ export const TradingGame: React.FC<TradingGameProps> = ({ token, realBalance, on
             pnl = ((pos.entryPrice - newPrice) / pos.entryPrice) * pos.size;
           }
           
-          // Check Liquidation
           if (pnl <= -pos.margin) {
-            // Liquidated!
             return { ...pos, pnl: -pos.margin, pnlPercent: -100, status: 'liquidated' };
           }
           
@@ -73,13 +99,13 @@ export const TradingGame: React.FC<TradingGameProps> = ({ token, realBalance, on
             pnl, 
             pnlPercent: (pnl / pos.margin) * 100 
           };
-        }).filter(p => (p as any).status !== 'liquidated')); // Remove liquidated for simplicity in demo
+        }).filter(p => (p as any).status !== 'liquidated')); 
         
         return newPrice;
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [symbol]); // Restart simulation on symbol change
 
   // --- Chart Drawing ---
   useEffect(() => {
@@ -138,7 +164,7 @@ export const TradingGame: React.FC<TradingGameProps> = ({ token, realBalance, on
         
       const newPos: Position = {
         id: Math.random().toString(36).substr(2, 9),
-        symbol: 'BTC/USD',
+        symbol: symbol,
         direction,
         entryPrice: price,
         leverage,
@@ -166,7 +192,7 @@ export const TradingGame: React.FC<TradingGameProps> = ({ token, realBalance, on
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            symbol: 'BTC/USD',
+            symbol: symbol,
             direction,
             leverage,
             margin,
@@ -224,10 +250,20 @@ export const TradingGame: React.FC<TradingGameProps> = ({ token, realBalance, on
     <div className="trading-game">
       {/* Header / Mode Switch */}
       <div className="game-header">
+        <div className="pair-selector">
+          {Object.keys(COINS).map(s => (
+            <button 
+              key={s} 
+              className={symbol === s ? 'active-pair' : 'pair-btn'} 
+              onClick={() => changeSymbol(s)}
+            >
+              {s.split('/')[0]}
+            </button>
+          ))}
+        </div>
         <div className="pair-info">
-          <h2>BTC/USD</h2>
+          <h2>{symbol}</h2>
           <span className="price">${price.toFixed(2)}</span>
-          <span className="change">+2.4%</span>
         </div>
         
         <div className="account-controls">
