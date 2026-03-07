@@ -257,7 +257,7 @@ function App() {
         <div className="dashboard">
           <nav className="sidebar">
             <div className="logo">
-              <TrendingUp size={28} /> SUI24
+              <img src="/logo.png" alt="SUI24" style={{height: '32px'}} />
             </div>
             <div className="menu">
               <button className="menu-item active">
@@ -302,7 +302,7 @@ function App() {
     <div className="dashboard">
       <nav className="sidebar">
         <div className="logo">
-          <TrendingUp size={28} /> SUI24
+          <img src="/logo.png" alt="SUI24" style={{height: '32px'}} />
         </div>
         <div className="menu">
           <button className={`menu-item ${activeTab === 'trade' ? 'active' : ''}`} onClick={() => setActiveTab('trade')}>

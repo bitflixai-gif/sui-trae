@@ -12,7 +12,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlay, onLogin }) => 
     <div className="landing-page">
       <nav className="landing-nav">
         <div className="logo">
-          <Zap size={24} /> SUI24
+          <img src="/logo.png" alt="SUI24" />
         </div>
         <div className="nav-links">
           <button onClick={onLogin} className="btn-login">Login</button>

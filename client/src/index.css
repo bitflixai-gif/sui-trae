@@ -3,15 +3,19 @@
   line-height: 1.5;
   font-weight: 400;
   
-  --bg-dark: #0f172a;
-  --bg-card: #1e293b;
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
+  --bg-dark: #050505;
+  --bg-card: #0f1115;
+  --primary: #00f3ff;
+  --primary-hover: #00c2cc;
+  --accent: #00ff9d;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --success: #10b981;
+  --success: #00ff9d;
   --warning: #f59e0b;
-  --danger: #ef4444;
+  --danger: #ff2a2a;
+  
+  --glow-primary: 0 0 20px rgba(0, 243, 255, 0.3);
+  --glow-accent: 0 0 20px rgba(0, 255, 157, 0.3);
 }
 
 body {
@@ -19,6 +23,7 @@ body {
   min-height: 100vh;
   background-color: var(--bg-dark);
   color: var(--text-primary);
+  background-image: radial-gradient(circle at 50% 0%, #1a2c38 0%, #050505 60%);
 }
 
 /* Auth Styles */
